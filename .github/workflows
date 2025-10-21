@@ -1,1 +1,37 @@
 
+name: Generate Snake
+
+on:
+  schedule:          # Runs every 12 hours
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+# allow the workflow to push files
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Generate Snake SVG (svg-only)
+        uses: Platane/snk/svg-only@v3
+        with:
+          # use repository owner (your profile repo)
+          github_user_name: ${{ github.repository_owner }}
+          # output path in repo
+          outputs: |
+            output/snake.svg
+
+      - name: Commit generated SVG
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: "chore: update snake animation"
+          add: "output/snake.svg"
